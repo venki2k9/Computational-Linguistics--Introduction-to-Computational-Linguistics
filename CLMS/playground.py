@@ -58,3 +58,24 @@ if result:
 print u"<html><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><body>"
 print(u"\u0E48")
 print u"</body></html>"
+
+
+
+file_path = "/Users/tumuluri/CLMS-Projects/Project3/fsm-input.utf8.txt"
+fl = open(file_path,'r')
+
+print u"<html><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><body>"
+
+for line in fl.readlines():
+    #line = line.rstrip()
+    fsm_modified_line = ''.encode('UTF-8')
+    eof = False
+    idx = 0
+    line = line.decode('UTF-8')
+    while not eof:
+        chr = line[idx]
+        if chr == '\n'.encode('UTF-8'):
+            eof = True
+        print("chr:"+chr)
+        idx = idx + 1
+    break

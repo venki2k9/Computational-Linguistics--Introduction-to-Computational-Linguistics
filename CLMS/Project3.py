@@ -1,23 +1,3 @@
-##!/opt/python-2.7/bin/python2.7 -S
-##  -*- coding: utf-8 -*-
-
-# Script to copy standard input to standard output, one line at a time.
-
-# This gets various items to interfaces with the OS, including the
-# standard input stream.
-import sys
-import os
-import encodings
-
-# This is apparently for Python rogues, but I got it from SO and it seems to work.
-# http://stackoverflow.com/questions/11741574/how-to-set-the-default-encoding-to-utf-8-in-python
-# A key trick is the -S business above in the shebang line.
-#sys.setdefaultencoding("UTF-8")
-
-print sys.getdefaultencoding()
-import site
-
-import codecs
 
 V1 = u"\u0E40\u0E41\u0E42\u0E43\u0E44"
 C1 = u"\u0E01\u0E02\u0E03\u0E04\u0E05\u0E06\u0E07\u0E08\u0E09\u0E0A\u0E0B\u0E0C\u0E0D\u0E0E\u0E0F" \
@@ -166,7 +146,6 @@ def GenerateFSM():
     #print(FSM[0])
     return FSM
 
-
 file_path = "/Users/tumuluri/CLMS-Projects/Project3/fsm-input.utf8.txt"
 fl = open(file_path,'r')
 
@@ -174,83 +153,43 @@ print u"<html><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'
 FSM = GenerateFSM()
 
 for line in fl.readlines():
-    line = line.rstrip()
-    fsm_modified_line = ''.encode('UTF-8')
+
     state = 0
     next_state = 0
-    for chr in line.decode('UTF-8'):
-        if state in final_states_set:
-            state = FSM[state]["next_state"]
-
-        required_chr_set = ""
-        for chr_set in FSM[state]["order"]:
-            if master_char_dict[chr].has_key(chr_set):
-                required_chr_set = chr_set
-            else:
-                pass
-
-        brk = FSM[state]["br"]
-        prevChr = FSM[state]["prev"]
-
-        if state not in final_states_set:
-            next_state = FSM[state][required_chr_set]
-
-        next_brk = FSM[next_state]["br"]
-        next_prevChr = FSM[next_state]["prev"]
-        if next_brk and next_prevChr:
-             fsm_modified_line = fsm_modified_line+" ".encode('UTF-8')+chr
-        elif next_brk and not next_prevChr:
-            fsm_modified_line = fsm_modified_line + chr+ " ".encode('UTF-8')
-        else:
-            fsm_modified_line = fsm_modified_line + chr
-
-
-        state = next_state
-
-    fsm_modified_line = fsm_modified_line + "</br>"
-    print(fsm_modified_line)
-print u"</body></html>"
-
-file_path = "/Users/tumuluri/CLMS-Projects/Project3/fsm-input.utf8.txt"
-fl = open(file_path,'r')
-
-print u"<html><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><body>"
-FSM = GenerateFSM()
-
-for line in fl.readlines():
-    line = line.rstrip()
+    eof = False
+    idx = 0
+    line = line.decode('UTF-8')
     fsm_modified_line = ''.encode('UTF-8')
-    state = 0
-    next_state = 0
-    for chr in line.decode('UTF-8'):
-        if state in final_states_set:
-            state = FSM[state]["next_state"]
-
-        required_chr_set = ""
-        for chr_set in FSM[state]["order"]:
-            if master_char_dict[chr].has_key(chr_set):
-                required_chr_set = chr_set
-            else:
-                pass
-
-        brk = FSM[state]["br"]
-        prevChr = FSM[state]["prev"]
-
-        if state not in final_states_set:
-            next_state = FSM[state][required_chr_set]
-
-        next_brk = FSM[next_state]["br"]
-        next_prevChr = FSM[next_state]["prev"]
-        if next_brk and next_prevChr:
-             fsm_modified_line = fsm_modified_line+" ".encode('UTF-8')+chr
-        elif next_brk and not next_prevChr:
-            fsm_modified_line = fsm_modified_line + chr+ " ".encode('UTF-8')
+    while not eof:
+        chr = line[idx]
+        if chr == '\n'.encode('UTF-8'):
+            eof = True
         else:
-            fsm_modified_line = fsm_modified_line + chr
+            if state not in final_states_set:
+                chr = line[idx]
+                fsm_modified_line = fsm_modified_line + chr
 
+                required_chr_set = ''
+                for chr_set in FSM[state]["order"]:
+                    if master_char_dict[chr].has_key(chr_set):
+                        required_chr_set = chr_set
+                        break
+                    else:
+                        pass
 
-        state = next_state
+                next_state = FSM[state][required_chr_set]
+                state = next_state
 
-    fsm_modified_line = fsm_modified_line + "</br>"
-    print(fsm_modified_line)
+                idx = idx + 1
+            else:
+                if state == 9:
+                    fsm_modified_line = fsm_modified_line + " ".encode('UTF-8')
+                    state = FSM[state]["next_state"]
+                else:
+                    prior = fsm_modified_line[0:len(fsm_modified_line)-1]
+                    post = fsm_modified_line[len(fsm_modified_line)-1]
+                    fsm_modified_line = prior + " ".encode('UTF-8') + post
+                    state = FSM[state]["next_state"]
+
+    print(fsm_modified_line + '<br/>')
 print u"</body></html>"
