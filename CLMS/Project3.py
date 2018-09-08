@@ -146,7 +146,7 @@ def GenerateFSM():
     #print(FSM[0])
     return FSM
 
-file_path = "/Users/tumuluri/CLMS-Projects/Project3/fsm-input.utf8.txt"
+file_path = "/opt/dropbox/18-19/473/project3/fsm-input.utf8.txt"
 fl = open(file_path,'r')
 
 print u"<html><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /><body>"
@@ -159,7 +159,7 @@ for line in fl.readlines():
     eof = False
     idx = 0
     line = line.decode('UTF-8')
-    fsm_modified_line = ''.encode('UTF-8')
+    fsm_modified_line = u''.encode('UTF-8')
     while not eof:
         chr = line[idx]
         if chr == '\n'.encode('UTF-8'):
@@ -191,5 +191,5 @@ for line in fl.readlines():
                     fsm_modified_line = prior + " ".encode('UTF-8') + post
                     state = FSM[state]["next_state"]
 
-    print(fsm_modified_line + '<br/>')
+    print(fsm_modified_line.encode('UTF-8')+'<br/>')
 print u"</body></html>"
