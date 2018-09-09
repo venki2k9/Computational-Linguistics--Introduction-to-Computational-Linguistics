@@ -63,7 +63,7 @@ class TargetPatternTree:
             #print(seq_chr)
             if self.search_pointer.getChildNode(seq_chr):
                 if self.search_pointer.endofsequenceflag:
-                    print(str(idx) + '\t' + dna_seq[last_sequence_idx:idx+1])
+                    print(str(hex(idx)) + '\t' + dna_seq[last_sequence_idx:idx+1])
                     if self.search_pointer.getChildNode(seq_chr).TerminalNode:
                         self.search_pointer = self.root
                         last_sequence_idx = idx + 1
@@ -110,7 +110,10 @@ def GetTargets(target_file):
     target_tree = TargetPatternTree()
     fl = open(target_file,'r')
     for line in fl.readlines():
+        line = line.strip()
+        line = line.upper()
         target_tree.InsertIntoTree(line)
+    return target_tree
 
 
 def TestTargets():
@@ -125,16 +128,18 @@ def TestTargets():
     #target_tree.DescribeTree()
     target_tree.SearchTree('GCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCAGCAGCAGCATGCATGCANNGATGCA')
 
-def GetDNASequences(DNA_Sequence_loc):
+def GetDNASequences(DNA_Sequence_loc,target_tree):
     for fl in os.listdir(DNA_Sequence_loc):
         fl = os.path.join(DNA_Sequence_loc,fl)
         fobj = open(fl,'r')
         dna_seq_str = fobj.read()
+        dna_seq_str = dna_seq_str.strip()
         dna_seq_str = dna_seq_str.upper()
-        print(type(dna_seq_str))
+        target_tree.SearchTree(dna_seq_str)
+        return dna_seq_str
 
 
-
-
-GetDNASequences(dna_sequence_location)
-TestTargets()
+#TestTargets()
+target_tree = GetTargets(target_file=target_file)
+#target_tree.DescribeTree()
+GetDNASequences(dna_sequence_location,target_tree=target_tree)
